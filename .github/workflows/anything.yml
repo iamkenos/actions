@@ -18,9 +18,9 @@ jobs:
       - name: Get branch slugs
         uses: rlespinasse/github-slug-action@v3.x
       - name: Long running task 1
+        continue-on-error: true
         run: exit 1
       - name: Get PR number
-        if: ${{ always() }}
         id: get_pr
         uses: jwalton/gh-find-current-pr@v1
       - name: Comment on PR
