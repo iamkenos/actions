@@ -1,0 +1,30 @@
+name: Anything
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - master
+
+jobs:
+  'job-1':
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get branch slugs
+        uses: rlespinasse/github-slug-action@v3.x
+      - name: Get PR number
+        if: ${{ always() }}
+        id: get_pr
+        uses: jwalton/gh-find-current-pr@v1
+      - name: Comment on PR
+        if: ${{ steps.get_pr.outputs.pr != ''}}
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: ${{ steps.get_pr.outputs.pr }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'hello world'
+            })
