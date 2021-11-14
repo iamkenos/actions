@@ -2,14 +2,18 @@ name: Anything
 
 on:
   workflow_dispatch:
-
+    inputs:
+      skip_something:
+        description: "[Boolean]: Skip somthing"
+        default: "false"
+        required: true
   push:
     branches:
       - master
 
-  pull_request:
-    branches:
-      - master
+  # pull_request:
+  #   branches:
+  #     - master
 
 jobs:
   job-1:
@@ -26,7 +30,7 @@ jobs:
         id: get_pr
         uses: jwalton/gh-find-current-pr@v1
       - name: Comment on PR
-        if: ${{ (failure() || success()) && steps.get_pr.outputs.pr != ''}}
+        if: ${{ (failure() || success()) && steps.get_pr.outputs.pr != '' && github.event.inputs.skip_something != 'true' }}
         uses: actions/github-script@v5
         with:
           script: |
@@ -34,5 +38,6 @@ jobs:
               issue_number: ${{ steps.get_pr.outputs.pr }},
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '[This](https://github.com/iamkenos/actions/actions/runs/${{ github.run_id }}) workflow ${{ fromJSON('{ "failure":"failed", "success":"passed" }')[job.status] }} on ${{ github.sha }} '
+              body: `[This](https://github.com/iamkenos/actions/actions/runs/${{ github.run_id }}) workflow ${{ fromJSON('{ "failure":"failed", "success":"passed" }')[job.status] }} on ${{ github.sha }}
+              Refer to [this link]()....`
             })
