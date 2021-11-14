@@ -18,6 +18,8 @@ on:
 jobs:
   job-1:
     runs-on: ubuntu-latest
+    permissions:
+      checks: write 
     steps:
       - name: Get branch slugs
         uses: rlespinasse/github-slug-action@v3.x
@@ -41,3 +43,29 @@ jobs:
               body: `[This](https://github.com/iamkenos/actions/actions/runs/${{ github.run_id }}) workflow ${{ fromJSON('{ "failure":"failed", "success":"passed" }')[job.status] }} on ${{ github.sha }}
               Refer to [this link]()....`
             })
+      - name: Set status
+        if: always()
+        uses: ouzi-dev/commit-status-updater@v1.1.0
+        with:
+          status: "${{ job.status }}"
+      - name: Create check run status
+        if: ${{ always() }}
+        run: |
+          curl --request POST \
+          --url https://api.github.com/repos/${{ github.repository }}/check-runs
+          --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+          --header 'content-type: application/json' \
+          --data '{"name":"build", "head_sha": "'"${{ github.sha }}"'", "status": "completed", "conclusion": "success" }'
+      - name: Create status
+        if: ${{ always() }}
+        run: |
+          curl --request POST \
+          --url https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.event.workflow_run.head_commit.id }} \
+          --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+          --header 'content-type: application/json' \
+          --data '{
+            "state": "${{ github.event.workflow_run.conclusion }}",
+            "context": "Anything",
+            "target_url": "${{ github.event.workflow_run.html_url }}"
+            }' \
+          --fail
