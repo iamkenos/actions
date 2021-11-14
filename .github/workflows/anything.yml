@@ -18,7 +18,7 @@ jobs:
       - name: Get branch slugs
         uses: rlespinasse/github-slug-action@v3.x
       - name: Long running task 1
-        run: exit 1
+        run: exit 0
       - name: Long running task 2
         run: exit 1
       - name: Get PR number
@@ -34,5 +34,5 @@ jobs:
               issue_number: ${{ steps.get_pr.outputs.pr }},
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '[This]() workflow ran with a ${{ (failure() ? 'failed' : 'successful') }} status.'
+              body: '[This](https://github.com/iamkenos/actions/actions/runs/${{ github.run_id }}) workflow ${{ fromJSON('{ "failure":"failed", "success":"passed" }')[job.status] }} on ${{ github.sha }} '
             })
