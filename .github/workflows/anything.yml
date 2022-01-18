@@ -15,12 +15,20 @@ jobs:
   job-1:
     runs-on: ubuntu-latest
     steps:
+      - name: Configure git
+        run: git config --global core.autocrlf false
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          ref: $GITHUB_REF_NAME
+      - name: Get event
+        run: echo $GITHUB_REF_NAME
       - name: Get branch slugs
         uses: rlespinasse/github-slug-action@v3.x
       - name: Long running task 1
         run: exit 0
       - name: Long running task 2
-        run: exit 1
+        run: exit 0
       - name: Get PR number
         if: ${{ always() }}
         id: get_pr
