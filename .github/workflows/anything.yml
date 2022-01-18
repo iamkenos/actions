@@ -2,13 +2,13 @@ name: Anything
 
 on:
   schedule:
-    - cron:  '*/2 * * * *'
+    - cron: "*/2 * * * *"
 
   workflow_dispatch:
 
   push:
     branches:
-      - '*'
+      - "*"
 
   # pull_request:
   #   branches:
@@ -21,14 +21,24 @@ jobs:
       - name: Configure git
         run: git config --global core.autocrlf false
       - name: Event context
-        run: |
-          echo $EVENT_CONTEXT
+        run: echo $EVENT_CONTEXT
         env:
           EVENT_CONTEXT: ${{ toJSON(github.event) }}
+      - name: Get checkout ref
+        run: |
+          if [ $IS_SCHEDULED ]; then checkout_ref=$CRON_REF; else checkout_ref=$DISPATCH_REF; fi
+          echo '-------------------------' $IS_SCHEDULED
+          echo '-------------------------' $checkout_ref
+          echo "::set-output name=checkout_ref::$(echo $checkout_ref)"
+        env:
+          IS_SCHEDULED: ${{ github.event.schedule }}
+          DISPATCH_REF: ${{ github.ref }}
+          CRON_REF: release
+        id: get_checkout_ref
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          ref: ${{ env.GITHUB_REF_NAME }}
+          ref: ${{ steps.get_checkout_ref.outputs.checkout_ref }}
       - name: Get branch slugs
         uses: rlespinasse/github-slug-action@v3.x
       - name: Long running task 1
