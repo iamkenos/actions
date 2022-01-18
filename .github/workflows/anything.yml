@@ -5,11 +5,11 @@ on:
 
   push:
     branches:
-      - master
+      - '*'
 
-  pull_request:
-    branches:
-      - master
+  # pull_request:
+  #   branches:
+  #     - master
 
 jobs:
   job-1:
@@ -17,12 +17,12 @@ jobs:
     steps:
       - name: Configure git
         run: git config --global core.autocrlf false
+      - name: ref
+        run: echo $GITHUB_REF_NAME
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          ref: $GITHUB_REF_NAME
-      - name: Get event
-        run: echo $GITHUB_REF_NAME
+          ref: ${{ env.GITHUB_REF_NAME }}
       - name: Get branch slugs
         uses: rlespinasse/github-slug-action@v3.x
       - name: Long running task 1
