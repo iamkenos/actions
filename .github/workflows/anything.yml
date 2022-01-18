@@ -26,12 +26,12 @@ jobs:
           EVENT_CONTEXT: ${{ toJSON(github.event) }}
       - name: Get checkout ref
         run: |
-          if [ $IS_SCHEDULED ]; then checkout_ref=$CRON_REF; else checkout_ref=$DISPATCH_REF; fi
+          if [ $IS_SCHEDULED == 'true' ]; then checkout_ref=$CRON_REF; else checkout_ref=$DISPATCH_REF; fi
           echo '-------------------------' $IS_SCHEDULED
           echo '-------------------------' $checkout_ref
           echo "::set-output name=checkout_ref::$(echo $checkout_ref)"
         env:
-          IS_SCHEDULED: ${{ github.event.schedule }}
+          IS_SCHEDULED: ${{ github.event.schedule != '' }}
           DISPATCH_REF: ${{ github.ref }}
           CRON_REF: release
         id: get_checkout_ref
