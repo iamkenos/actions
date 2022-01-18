@@ -3,9 +3,9 @@ name: Anything
 on:
   workflow_dispatch:
 
-  push:
-    branches:
-      - master
+  # push:
+  #   branches:
+  #     - '*'
 
   pull_request:
     branches:
@@ -15,12 +15,21 @@ jobs:
   job-1:
     runs-on: ubuntu-latest
     steps:
+      - name: Configure git
+        run: git config --global core.autocrlf false
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          ref: release
+      - name: Get event
+        run: | 
+          echo $GITHUB_REF_NAME
       - name: Get branch slugs
         uses: rlespinasse/github-slug-action@v3.x
       - name: Long running task 1
         run: exit 0
       - name: Long running task 2
-        run: exit 1
+        run: exit 0
       - name: Get PR number
         if: ${{ always() }}
         id: get_pr
