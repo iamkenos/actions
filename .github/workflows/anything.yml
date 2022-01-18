@@ -1,6 +1,9 @@
 name: Anything
 
 on:
+  schedule:
+    - cron:  '* * * * *'
+
   workflow_dispatch:
 
   push:
@@ -17,8 +20,11 @@ jobs:
     steps:
       - name: Configure git
         run: git config --global core.autocrlf false
-      - name: ref
-        run: echo $GITHUB_REF_NAME
+      - name: Event context
+        run: |
+          echo $EVENT_CONTEXT
+        env:
+          EVENT_CONTEXT: ${{ toJSON(github.event) }}
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
