@@ -5,6 +5,15 @@ on:
   #   - cron: "*/2 * * * *"
 
   workflow_dispatch:
+    inputs:
+      environment:
+        description: "Select the environment"
+        default: "staging"
+        type: choice
+        options:
+          - development
+          - staging
+          - production
 
   push:
     branches:
